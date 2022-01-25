@@ -41,15 +41,15 @@
 \begin{document}
 	\section*{\centering Lesson 1 : DC Motor}
 	\section{Background}
-		DC motor is a mechatronic product that consist of two parts: the mechanical part and the electrical part. A typical dc motor used by a robot is constructed by: a dc motor, a wheel encoder (for measuring rotation pulse of motor ), and a gear box (for reducing the speed of motor).
-		
-		\begin{figure}[ht]
-			\centering
-			\includegraphics[scale=1]{src/img/fig1.pdf}
-			\caption{Typical dc motor}
-			\label{fig:Typical dc motor}
-		\end{figure}
-		
+	DC motor is a mechatronic product that consist of two parts: the mechanical part and the electrical part. A typical dc motor used by a robot is constructed by: a dc motor, a wheel encoder (for measuring rotation pulse of motor ), and a gear box (for reducing the speed of motor).
+	
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[scale=1]{src/img/fig1.pdf}
+		\caption{Typical dc motor}
+		\label{fig:Typical dc motor}
+	\end{figure}
+	
 	\section{Modelling}
 	
 	\begin{figure}[ht]
@@ -58,7 +58,7 @@
 		\caption{dc motor model}
 		\label{fig:dc motor model}
 	\end{figure}
-		
+	
 	\subsection{Electrical Part}
 	\begin{equation}
 		v_b(t) = K_b \dot{\theta}(t) = K_b \omega(t)
@@ -68,9 +68,9 @@
 	\begin{itemize}
 		\item {\makebox[1cm]{\(v_b(t)\)\hfill} is voltage at terminal conductor of motor }
 		\item {\makebox[1cm]{\(K_b\)\hfill} is back emf constant}
-		\item {\makebox[1cm]{\(\dot{\theta} = \omega\)\hfill} angular velocity of motor}
+		\item {\makebox[1cm]{\(\dot{\theta} = \omega\)\hfill} is angular velocity of motor}
 	\end{itemize}
-
+	
 	\begin{equation}
 		T_a = K_t i_a(t)
 		\label{eq2}
@@ -88,7 +88,7 @@
 		\item {\makebox[3.5cm]{\(v_{resistance} = R_a i_a(t)\)\hfill} is voltage across resistance}
 		\item {\makebox[3.5cm]{\(v_{inductor} = L_a \frac{di_a(t)}{d(t)}\)\hfill} is voltage across inductor}
 	\end{itemize}
-
+	
 	\[v_a(t) - v_b(t) - R_a i_a(t) - L_a \frac{di_a(t)}{d(t)} = 0\]
 	
 	\begin{equation}
@@ -109,9 +109,9 @@
 		\Rightarrow \boxed{i_a(t) = \frac{v_a(t) - K_b \omega(t)}{R_a}}
 		\label{eq5}
 	\end{equation}
-
+	
 	\subsection{Mechanical Part}
-
+	
 	\begin{equation}
 		T_a = T_f + J \dot{\omega}(t)
 		\label{eq6}
@@ -151,7 +151,7 @@
 		\Rightarrow \boxed{i_a(t) = \frac{T_c sign[\omega(t)] + D\omega(t) + J \dot{\omega}(t)}{K_t}}
 		\label{eq10}
 	\end{equation}
-
+	
 	\section{Electrical and Mechanical combine}
 	\subsection{Approximation of coulomb friction to zero \(T_c \approx 0\)}
 	
@@ -165,7 +165,7 @@
 	\[\dot{\omega}(t) = \frac{(v_a(t) - K_b \omega(t))K_t}{R_a J} - \frac{D\omega(t)}{J}\]
 	\[\dot{\omega}(t) = \frac{v_a(t) K_t - K_b K_t\omega(t)}{R_a J} - \frac{D\omega(t)}{J}\]
 	Separate \(\omega(t)\) and \(v_a(t)\):
-
+	
 	\begin{equation}
 		\boxed{\dot{\omega}(t) = - (\frac{K_b K_t + D R_a}{R_a J})\omega(t) + \frac{K_t}{R_a J}v_a(t)}
 		\label{eq11}
@@ -180,8 +180,8 @@
 		\Rightarrow \boxed{\dot{\omega}(t) = - a\omega(t) + bv_a(t)}
 		\label{eq12}
 	\end{equation}
-
-
+	
+	
 	\subsection{Keep coulomb friction \(T_c\)}
 	\begin{equation}
 		\boxed{\dot{\omega}(t) = - (\frac{K_b K_t + D R_a}{R_a J})\omega(t) + \frac{K_t}{R_a J}v_a(t) - \frac{T_c}{J}sign(\omega(t))}
@@ -198,7 +198,7 @@
 		\Rightarrow \boxed{\dot{\omega}(t) = - a\omega(t) + bv_a(t) - csign(\omega(t))}
 		\label{eq14}
 	\end{equation}
-
+	
 	\section{Simulation}
 	
 	In general, the equation \(\dot{\omega}(t) = - a\omega(t) + bv_a(t) - csign(\omega(t)\) is used to represent all the dc motor in the market. By modifying the parameters \(a, b, c\) will result in different dc motor.\\
@@ -209,7 +209,7 @@
 		\item {\makebox[1cm]{\(\omega(t)\) \hfill} is the angular velocity of dc motor and is the output of the system}
 		\item {\makebox[1cm]{\(v_a(t)\)\hfill} is the input voltage to dc motor and is the input of the system}
 	\end{itemize}
-
+	
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[scale=0.7]{example-image-a}
@@ -227,25 +227,7 @@
 	\end{figure}
 	
 	\begin{lstlisting}[language=MATLAB]
-	a = [1,2,3,4,5,6];
+		a = [1,2,3,4,5,6];
 	\end{lstlisting}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
 \end{document}

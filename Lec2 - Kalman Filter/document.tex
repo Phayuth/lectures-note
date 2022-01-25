@@ -1,0 +1,52 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
+\usepackage{hyperref} %for reference automatically
+\usepackage{fancyhdr}
+
+\pagestyle{fancy} % for header and footer
+\fancyhf{}
+\fancyhead[LE,RO]{Prepared by: Phayuth}
+\fancyhead[RE,LO]{Supervisor : Dr.Sarot Srang}
+\fancyfoot[LE,RO]{Page \thepage}
+\renewcommand{\headrulewidth}{2pt}
+\renewcommand{\footrulewidth}{1pt} % for header and footer
+
+% THIS IS THE XML CODE INCLUDE==============================================================
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstset{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	numbers=left,
+	breaklines=true,
+	tabsize=2,
+	basicstyle=\ttfamily\footnotesize,
+	literate={\ \ }{{\ }}1
+}
+
+
+\begin{document}
+	\section*{\centering Lesson 2 : Kalman Filter}
+	\section{Background}
+		Kalman Filter was found by Dr. Rudolf Emil Kálmán. This algorithm is a powerful filtering algorithm that has been used in many applications most notably in signal processing, control, optimization, sensor fusion, system identification -etc and it is able to implement online.
+	
+	\section{Kalman Filter (Linear System)}
+	
+	\section{Extended Kalman Filter (Nonlinear System)}
+	
+	\section{Unscented Kalman Filter (Nonlinear System)}
+		
+\end{document}
