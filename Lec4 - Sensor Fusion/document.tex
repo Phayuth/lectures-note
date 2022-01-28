@@ -1,0 +1,347 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
+\usepackage{hyperref} %for reference automatically
+\usepackage{fancyhdr}
+
+\pagestyle{fancy} % for header and footer
+\fancyhf{}
+\fancyhead[LE,RO]{Prepared by: Phayuth}
+\fancyhead[RE,LO]{Supervisor : Dr.Sarot Srang}
+\fancyfoot[LE,RO]{Page \thepage}
+\renewcommand{\headrulewidth}{2pt}
+\renewcommand{\footrulewidth}{1pt} % for header and footer
+
+% THIS IS THE XML CODE INCLUDE==============================================================
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstset{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	numbers=left,
+	breaklines=true,
+	tabsize=2,
+	basicstyle=\ttfamily\footnotesize,
+	literate={\ \ }{{\ }}1
+}
+
+
+\begin{document}
+	\section*{\centering Lesson 4 : Sensor Fusion}
+	\section{Background}
+	For filtering out noise of sensor and predicting the future change of state when there is an absence of sensor data, we use method of sensor fusion. There numerous way of doing a sensor fusion. Below are some of the application for sensor fusion. 
+	
+	\section{Differential Drive Robot Sensor Fusion for Linear and Angular Velocity}
+	In differential drive robot, we have a position model:
+	\begin{equation}
+		\begin{bmatrix}
+			\dot{x}      \\
+			\dot{y}      \\
+			\dot{\theta} 
+		\end{bmatrix}_{global}=
+		\begin{bmatrix}
+			V \cos \theta \\
+			V \sin \theta \\
+			\omega        
+		\end{bmatrix}
+		\label{eq1}
+	\end{equation}
+	Where:
+	\begin{itemize}
+		\item {\makebox[2cm]{\(\begin{bmatrix}
+					\dot{x}\\
+					\dot{y}\\
+					\dot{\theta}
+				\end{bmatrix}_{global}\)\hfill} is rate of change of position of the robot inside a global frame reference}
+		\item {\makebox[2cm]{\(\theta\)\hfill} is the heading angle of the robot inside a global frame}
+		\item {\makebox[2cm]{\(V\)\hfill} is the linear velocity of the robot inside a local robot frame}
+		\item {\makebox[2cm]{\(\omega\)\hfill} is the angular velocity of the robot inside a local robot frame}
+	\end{itemize}
+	\begin{center}
+		\textbf{Our purpose is to estimate the \(V\) and \(\omega\)}
+	\end{center}
+	Those two variable can be calculated from two sources: Wheel Encoder and IMU.\\
+	\subsection{From Wheel Encoder}
+	From differential drive robot kinematic model, We have:
+	\begin{equation}
+		V(t) = \dot{\phi}_r \frac{r}{2} + \dot{\phi}_l \frac{r}{2}
+		\label{eq2}
+	\end{equation}
+	\begin{equation}
+		\omega(t) = \dot{\phi}_r \frac{r}{L} - \dot{\phi}_l \frac{r}{L}
+		\label{eq3}
+	\end{equation}
+	Where:
+	\begin{itemize}
+		\item {\makebox[1cm]{\(\dot{\phi}_r\)\hfill} is the rotation velocity of the right wheel}
+		\item {\makebox[1cm]{\(\dot{\phi}_l\)\hfill} is the rotation velocity of the left wheel}
+		\item {\makebox[1cm]{\(r\)\hfill} is the wheel radius}
+		\item {\makebox[1cm]{\(L\)\hfill} is the robot based length}
+	\end{itemize}
+	Wheel rotation velocity is calculated from the wheel encoder by:
+	\begin{equation}
+		\dot{\phi} = \frac{\phi_{k+1} - \phi_{k}}{T_s}
+		\label{eq4}
+	\end{equation}
+	\begin{equation}
+		\phi = \frac{2 \times \pi \times encoder\ ticks}{Gear Box \times Pulse\ per\ Revolution}
+		\label{eq5}
+	\end{equation}
+	\subsection{From IMU Sensor}
+	We have:
+	\begin{equation}
+		\dot{V} = a_{imu-x} + b
+		\label{eq6}
+	\end{equation}
+	\begin{equation}
+		\omega = \omega_{imu} + b
+		\label{eq7}
+	\end{equation}
+	Where:
+	\begin{itemize}
+		\item {\makebox[2cm]{\(a_{imu-x}\)\hfill} is the imu accelerometer in x-axis local frame }
+		\item {\makebox[2cm]{\(\omega_{imu-z}\)\hfill} is the imu gyroscope in z-axis local frame}
+		\item {\makebox[2cm]{\(b\)\hfill} is the biased of imu measurement}
+	\end{itemize}
+	\subsection{Estimate \(V\)}
+	From model:
+	\begin{equation}
+		\begin{split}
+			\dot{V} &= a_{imu-x} + b \\
+			\dot{b} &= 0
+		\end{split}
+		\label{eq8}
+	\end{equation}
+	Let:
+	\[\begin{split}
+		x_1 &= V \rightarrow \dot{x_1} = a_{imu-x} + b \\
+		x_2 &= b \rightarrow \dot{x_2} = 0
+	\end{split}\]
+	Discretized the model:
+	\[\begin{split}
+		x_{1,k+1} &= x_{1,k} + a_{imu-x,k}T_s + bT_s \\
+		x_{2,k+1} &= x_{2,k}
+	\end{split}\]
+	Or:
+	\[\begin{split}
+		x_{1,k+1} &= x_{1,k} + u_kT_s + x_{2,k}T_s \\
+		x_{2,k+1} &= x_{2,k}
+	\end{split}\]
+	In state space form, we have a model:
+	\begin{equation}
+		\boxed{
+			\begin{bmatrix}
+				x_1 \\
+				x_2 
+			\end{bmatrix}_{k+1} = 
+			\begin{bmatrix}
+				1 &   & T_s \\
+				0 &   & 1   
+			\end{bmatrix}
+			\begin{bmatrix}
+				x_1 \\
+				x_2 
+			\end{bmatrix}_k +
+			\begin{bmatrix}
+				T_s \\
+				0   
+			\end{bmatrix} u_k
+		}
+		\label{eq9}
+	\end{equation}
+	Or:
+	\begin{equation}
+		\boxed{
+			\begin{bmatrix}
+				V \\
+				b 
+			\end{bmatrix}_{k+1} = 
+			\begin{bmatrix}
+				1 &   & T_s \\
+				0 &   & 1   
+			\end{bmatrix}
+			\begin{bmatrix}
+				V \\
+				b 
+			\end{bmatrix}_k +
+			\begin{bmatrix}
+				T_s \\
+				0   
+			\end{bmatrix} a_{imu-x,k}
+		}
+		\label{eq10}
+	\end{equation}
+	We have a output model:
+	\begin{equation}
+		\boxed{
+			y_k = 
+			\begin{bmatrix}
+				1 &   & 0 
+			\end{bmatrix}
+			\begin{bmatrix}
+				x_1 \\
+				x_2 
+			\end{bmatrix}_k = 
+			\begin{bmatrix}
+				1 &   & 0 
+			\end{bmatrix}
+			\begin{bmatrix}
+				V \\
+				b 
+			\end{bmatrix}_k
+		}
+		\label{eq11}
+	\end{equation}
+	Check observability:
+	\[obs = 
+	\begin{bmatrix}
+		C  \\
+		CA 
+	\end{bmatrix}\]
+	We have:
+	\[A = 
+	\begin{bmatrix}
+		1 &   & T_s \\
+		0 &   & 1   
+	\end{bmatrix} \text{and } C = 
+	\begin{bmatrix}
+		1 &   & 0 
+	\end{bmatrix}\]
+	\[\rightarrow obs = 
+	\begin{bmatrix}
+		1 &   & 0   \\
+		1 &   & T_s 
+	\end{bmatrix} \text{is full rank = observable.}\]
+	
+	\subsection{Estimate \(\omega\)}
+	From model:
+	\begin{equation}
+		\begin{split}
+			\omega_{k+1} &= \omega_{imu-z} + b_k \\
+			b_{k+1} &= b_k
+		\end{split}
+		\label{eq12}
+	\end{equation}
+	Let:
+	\[\begin{split}
+		x_1 &= \omega \rightarrow \dot{x_1} = 0 \\
+		x_2 &= b \rightarrow \dot{x_2} = 0
+	\end{split}\]
+	Discretized the model:
+	\[\begin{split}
+		x_{1,k+1} &= \omega_{imu-z} + b_k \\
+		x_{2,k+1} &= b_k
+	\end{split}\]
+	Or:
+	\[\begin{split}
+		x_{1,k+1} &= u_k + x_{2,k} \\
+		x_{2,k+1} &= x_{2,k}
+	\end{split}\]
+	In state space form, we have a model:
+	\begin{equation}
+		\boxed{
+			\begin{bmatrix}
+				x_1 \\
+				x_2 
+			\end{bmatrix}_{k+1} = 
+			\begin{bmatrix}
+				0 &   & 1 \\
+				0 &   & 1 
+			\end{bmatrix}
+			\begin{bmatrix}
+				x_1 \\
+				x_2 
+			\end{bmatrix}_k +
+			\begin{bmatrix}
+				1 \\
+				0 
+			\end{bmatrix} u_k
+		}
+		\label{eq13}
+	\end{equation}
+	Or:
+	\begin{equation}
+		\boxed{
+			\begin{bmatrix}
+				\omega \\
+				b      
+			\end{bmatrix}_{k+1} = 
+			\begin{bmatrix}
+				0 &   & 1 \\
+				0 &   & 1 
+			\end{bmatrix}
+			\begin{bmatrix}
+				\omega \\
+				b      
+			\end{bmatrix}_k +
+			\begin{bmatrix}
+				1 \\
+				0 
+			\end{bmatrix} \omega_{imu-z}
+		}
+		\label{eq14}
+	\end{equation}
+	We have a output model:
+	\begin{equation}
+		\boxed{
+			y_k = 
+			\begin{bmatrix}
+				1 &   & 0 
+			\end{bmatrix}
+			\begin{bmatrix}
+				x_1 \\
+				x_2 
+			\end{bmatrix}_k = 
+			\begin{bmatrix}
+				1 &   & 0 
+			\end{bmatrix}
+			\begin{bmatrix}
+				\omega \\
+				b      
+			\end{bmatrix}_k
+		}
+		\label{eq15}
+	\end{equation}
+	Check observability:
+	\[obs = 
+	\begin{bmatrix}
+		C  \\
+		CA 
+	\end{bmatrix}\]
+	We have:
+	\[A = 
+	\begin{bmatrix}
+		0 &   & 1 \\
+		0 &   & 1 
+	\end{bmatrix} \text{and } C = 
+	\begin{bmatrix}
+		1 &   & 0 
+	\end{bmatrix}\]
+	\[\rightarrow obs = 
+	\begin{bmatrix}
+		1 &   & 0 \\
+		0 &   & 1 
+	\end{bmatrix} \text{is full rank = observable.}\]
+	
+	
+	
+	
+	
+	%%%\subsection{Estimate \(\omega\)}
+	
+	%%%\section{Three Wheels Omnidrive Robot Sensor Fusion for Linear and Angular Velocity}
+	
+	
+\end{document}
