@@ -324,9 +324,21 @@
 	2. \textbf{Compute state and covariance matrix in Time Update}\\
 	\textbf{Initialize}
 	\begin{itemize}
-		\item {\makebox[3.5cm]{\(T_s = 0.01\)\hfill} sampling time (s) , up to user}
-		\item {\makebox[3.5cm]{\(Q = 0.01 \times diag(3)\)\hfill} covariance, smaller is truth in process model (use for tuning)}
-		\item {\makebox[3.5cm]{\(R = 0.02\)\hfill} covariance, smaller is truth in measurement (use for tuning)}
+		\item {\makebox[2cm]{\(T_s = 0.01\)\hfill} sampling time (s) , up to user}
+		\item \(Q = 0.00001
+		\begin{bmatrix}
+			10 & 0  & 0  \\
+			0  & 25 & 0  \\
+			0  & 0  & 25 
+		\end{bmatrix} 
+		= 0.00001 \times diag([10\quad 25\quad 25])\) \\process covariance matrix, smaller is truth in process model (use for tuning)
+		\item \(R = 0.02
+		\begin{bmatrix}
+			1 & 0 & 0 \\
+			0 & 1 & 0 \\
+			0 & 0 & 1 
+		\end{bmatrix} 
+		= 0.02 \times diag([1\quad 1\quad 1])\) \\measurement covariance matrix, smaller is truth in measurement (use for tuning)
 	\end{itemize}
 	Compute \[\hat{x}_{k+1|k} = \hat{x}_k + T_s
 	\begin{bmatrix}
@@ -335,12 +347,6 @@
 		0                      
 	\end{bmatrix} + \boxed{\sqrt{T_s Q_d}v_{noise,k}}\]
 	\(\boxed{\sqrt{T_s Q_d}v_{noise,k}}\leftarrow\) put this bunch if we use in simulation to simulate noise to a true system, don't put if taking real value from system because the system has noise already.
-	\[v_{noise,k} = 
-	\begin{bmatrix}
-		1 \\
-		1 \\
-		1 
-	\end{bmatrix}\]
 	Compute
 	\[P_{k+1|k} = A_kP_{k|k}A^T_k+Q\]
 	where:
@@ -376,11 +382,124 @@
 	From \autoref{eq4}, we have \(C = [1\quad 0\quad 0]\)
 	\\
 	Compute
-	\[\hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + P_{xz,k+1|k}P^{-1}_{zz,k+1|k}(y_{k+1}-\hat{y}_{k+1|k})\]
-	\(y_{k+1}\) is the measurement from sensor which has noise mixed inside. Get data directly from the sensor.
+	\[\boxed{\hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + P_{xz,k+1|k}P^{-1}_{zz,k+1|k}(y_{k+1}-\hat{y}_{k+1|k})}\]
+	Where \(y_{k+1}\) is the measurement from sensor which has noise mixed inside. Get data directly from the sensor.
 	\\
 	Compute
-	\[P_{k+1|k+1} = P_{k+1|k} - P_{xz,k+1|k}P^{-1}_{zz,k|k+1}P^T_{xz,k+1|k}\]
+	\[\boxed{P_{k+1|k+1} = P_{k+1|k} - P_{xz,k+1|k}P^{-1}_{zz,k|k+1}P^T_{xz,k+1|k}}\]
+	
+	
+	
+	
+	\subsection{Model with coulomb friction}
+	From \autoref{eq12}, We have:
+	\[
+	\begin{split}
+		x_{k+1} &= x_k + T_s
+		\begin{bmatrix}
+			-x_2 x_1 + x_3 v_{a,k} - x_4sign(x_1) \\
+			0                                     \\
+			0                                     \\
+			0                                     
+		\end{bmatrix} +\sqrt{T_s Q_d}v_{noise,k}\\
+		y_k &= 
+		\begin{bmatrix}
+			1 & 0 & 0 & 0 
+		\end{bmatrix}
+		\begin{bmatrix}
+			x_1 \\
+			x_2 \\
+			x_3 \\
+			x_4 
+		\end{bmatrix}_k+\sqrt{R}\omega_{noise,k}
+	\end{split}
+	\]
+	\begin{center}
+		\textbf{Applying Extended Kalman Filter}
+	\end{center}
+	1. \textbf{Initialize a state and positive definite error covariance matrix}
+	\[\begin{split}
+		\hat{x}_{0|0} &= \begin{bmatrix}
+			2 \\
+			13 \\
+			25 \\
+			1
+		\end{bmatrix} \text{ or some number randomly}\\
+		P_{0|0} &= 2*eye(4) = 
+		\begin{bmatrix}
+			2 & 0 & 0 & 0 \\
+			0 & 2 & 0 & 0 \\
+			0 & 0 & 2 & 0 \\
+			0 & 0 & 0 & 2 \\
+		\end{bmatrix} \text{ or some number randomly}
+	\end{split}\]
+	
+	2. \textbf{Compute state and covariance matrix in Time Update}\\
+	\textbf{Initialize}
+	\begin{itemize}
+		\item {\makebox[2cm]{\(T_s = 0.01\)\hfill} sampling time (s) , up to user}
+		\item \(Q = 0.00001
+		\begin{bmatrix}
+			10 & 0  & 0  & 0 \\
+			0  & 25 & 0  & 0 \\
+			0  & 0  & 25 & 0 \\
+			0  & 0  & 0  & 1 
+		\end{bmatrix} 
+		= 0.00001 \times diag([10\quad 25\quad 25\quad 1])\) \\process covariance matrix, smaller is truth in process model (use for tuning)
+		\item \(R = 0.02
+		\begin{bmatrix}
+			1 & 0 & 0 & 0 \\
+			0 & 1 & 0 & 0 \\
+			0 & 0 & 1 & 0 \\
+			0 & 0 & 0 & 1 
+		\end{bmatrix} 
+		= 0.02 \times diag([1\quad 1\quad 1\quad 1])\) \\measurement covariance matrix, smaller is truth in measurement (use for tuning)
+	\end{itemize}
+	Compute \[\hat{x}_{k+1|k} = \hat{x}_k + T_s
+	\begin{bmatrix}
+		-x_2 x_1 + x_3 v_{a,k} - x_4sign(x_1) \\
+		0                                     \\
+		0                                     \\
+		0                                     
+	\end{bmatrix} + \boxed{\sqrt{T_s Q_d}v_{noise,k}}\]
+	Compute
+	\[P_{k+1|k} = A_kP_{k|k}A^T_k+Q\]
+	where:
+	\[A_k =
+	\begin{bmatrix}
+		-x_2 & -x_1 & v_a & -sign(x_1) \\
+		0    & 0    & 0   & 0          \\
+		0    & 0    & 0   & 0          \\
+		0    & 0    & 0   & 0          
+	\end{bmatrix}\]
+	is the jacobian matrix calculated by derivative the state model from \autoref{eq11}.
+	\\
+	3. \textbf{Compute state and covariance matrix in Measurement Update}\\
+	Compute
+	\[\hat{y}_{k+1|k} = [1\quad 0\quad 0\quad 0]\hat{x}_{k+1|k} + D_ku_{a,k}\]
+	\\
+	Where: \(D_k = 0\)
+	\\
+	Compute \[
+	\begin{split}
+		P_{xz,k+1|k} &= P_{k+1|k}C^T_{k+1}\\
+		P_{zz,k+1|k} &= C_{k+1}P_{k+1|k}C^T_{k+1}+R
+	\end{split}\]
+	From \autoref{eq11}, we have \(C = [1\quad 0\quad 0\quad 0]\)
+	\\
+	Compute
+	\[\boxed{\hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + P_{xz,k+1|k}P^{-1}_{zz,k+1|k}(y_{k+1}-\hat{y}_{k+1|k})}\]
+	Where \(y_{k+1}\) is the measurement from sensor which has noise mixed inside. Get data directly from the sensor.
+	\\
+	Compute
+	\[\boxed{P_{k+1|k+1} = P_{k+1|k} - P_{xz,k+1|k}P^{-1}_{zz,k|k+1}P^T_{xz,k+1|k}}\]
+	
+	
+	
+	
+	
+	
+	
 	
 	\begin{lstlisting}[language=MATLAB]
 		function x_est = EKF(uk,y_true)
