@@ -6,7 +6,7 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
-\usepackage{hyperref} %for reference automatically
+\usepackage[hidelinks]{hyperref} %for reference automatically
 \usepackage{fancyhdr}
 
 \pagestyle{fancy} % for header and footer
@@ -86,19 +86,19 @@
 	\begin{itemize}
 		\item {\makebox[3.5cm]{\(v_a(t)\)\hfill} is input voltage from power source}
 		\item {\makebox[3.5cm]{\(v_{resistance} = R_a i_a(t)\)\hfill} is voltage across resistance}
-		\item {\makebox[3.5cm]{\(v_{inductor} = L_a \frac{di_a(t)}{d(t)}\)\hfill} is voltage across inductor}
+		\item {\makebox[3.5cm]{\(v_{inductor} = L_a \frac{di_a(t)}{dt}\)\hfill} is voltage across inductor}
 	\end{itemize}
 	
-	\[v_a(t) - v_b(t) - R_a i_a(t) - L_a \frac{di_a(t)}{d(t)} = 0\]
+	\[v_a(t) - v_b(t) - R_a i_a(t) - L_a \frac{di_a(t)}{dt} = 0\]
 	
 	\begin{equation}
-		\Rightarrow v_a(t) = v_b(t) + R_a i_a(t) + L_a \frac{di_a(t)}{d(t)}
+		\Rightarrow v_a(t) = v_b(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt}
 		\label{eq3}
 	\end{equation}
 	Substitute \autoref{eq1} into \autoref{eq3}, we get:
 	
 	\begin{equation}
-		v_a(t) = K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{d(t)}
+		v_a(t) = K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt}
 		\label{eq4}
 	\end{equation}
 	In practical dc motor the \(L_a\) is very small (\(L_a \approx 0\)) and neglectable.
@@ -189,9 +189,9 @@
 	\end{equation}
 	Let:
 	\begin{itemize}
-		\item {\makebox[4cm]{\(a = (\frac{K_b K_t + D R_a}{R_a J}) \omega(t)\)\hfill} \([1/s]\) }
+		\item {\makebox[4cm]{\(a = (\frac{K_b K_t + D R_a}{R_a J})\)\hfill} \([1/s]\) }
 		\item {\makebox[4cm]{\(b = \frac{K_t}{R_a J}\)\hfill} \([rad/s^2/V]\) }
-		\item {\makebox[4cm]{\(c = \frac{T_c}{J}\)\hfill} \([dddd]\) }
+		\item {\makebox[4cm]{\(c = \frac{T_c}{J}\)\hfill} \([.]\) }
 	\end{itemize}
 	We get lamped Parameter in a simplified form as:
 	\begin{equation}
@@ -212,22 +212,86 @@
 	
 	\begin{figure}[ht]
 		\centering
-		\includegraphics[scale=0.7]{example-image-a}
+		\includegraphics[scale=1]{src/img/fig3.pdf}
 		\caption{Simulation Flow}
 		\label{fig:Simulation Flow}
 	\end{figure}
-	
+	\break
 	\subsection{SIMULINK}
 	
 	\begin{figure}[ht]
 		\centering
-		\includegraphics[scale=0.7]{example-image-a}
-		\caption{SIMULINK simulation}
-		\label{fig:SIMULINK simulation}
+		\includegraphics[scale=1]{src/img/fig4.pdf}
+		\caption{SIMULINK Simulation Flow}
+		\label{fig:SIMULINK Simulation Flow}
 	\end{figure}
-	
-	\begin{lstlisting}[language=MATLAB]
-		a = [1,2,3,4,5,6];
-	\end{lstlisting}
-	
+
+	\section{DC Motor 2nd Order Model ($ L_a $ is not Neglected)}
+	\subsection{No Friction}
+	From \autoref{eq4} and \autoref{eq9}, we have:
+	\[\begin{split}
+		v_a(t) &= K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt} \\
+		i_a(t) &= \frac{D\omega(t) + J \dot{\omega}(t)}{K_t}
+	\end{split}\]
+	\[\begin{split}
+		\frac{di_a(t)}{d(t)} &= \frac{d}{dt}\left(\frac{D\omega(t) + J \dot{\omega}(t)}{K_t}\right) \\
+		&= \frac{1}{K_t}\frac{d}{dt}(D\omega(t) + J \dot{\omega}(t))\\
+		&= \frac{1}{K_t} \frac{d}{dt}(D\omega(t)) + \frac{d}{dt}(J \dot{\omega}(t)) \\
+		&= \frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t))
+	\end{split}\]
+	We get:
+	\begin{equation}
+		v_a(t) = K_b \omega(t) + R_a \frac{D\omega(t) + J \dot{\omega}(t)}{K_t} + L_a\frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t))
+		\label{eq15}
+	\end{equation}
+	\[\begin{split}
+		K_tv_a(t) &= K_tK_b \omega(t) + R_a (D\omega(t) + J \dot{\omega}(t)) + L_a (D\dot{\omega}(t) + J \ddot{\omega}(t)) \\
+		K_tv_a(t) &= K_tK_b \omega(t) + R_a D\omega(t) + R_a J \dot{\omega}(t) + L_a D\dot{\omega}(t) + L_aJ \ddot{\omega}(t) \\
+		K_tv_a(t) &= (K_tK_b + R_a D) \omega(t) + (R_a J + L_a D) \dot{\omega}(t) + L_aJ \ddot{\omega}(t) \\
+		L_aJ \ddot{\omega}(t) &= -(K_tK_b + R_a D) \omega(t) - (R_a J + L_a D) \dot{\omega}(t) + K_tv_a(t) \\
+		\ddot{\omega}(t) &= - \frac{R_a J + L_a D}{L_aJ} \dot{\omega}(t) -\frac{K_tK_b + R_a D}{L_aJ} \omega(t)  + \frac{K_t}{L_aJ}v_a(t) \\
+	\end{split}\]
+	Let:
+	\begin{itemize}
+		\item {\makebox[4cm]{\(a = \frac{R_a J + L_a D}{L_aJ}\)\hfill} \([.]\) }
+		\item {\makebox[4cm]{\(b = \frac{K_tK_b + R_a D}{L_aJ}\)\hfill} \([.]\) }
+		\item {\makebox[4cm]{\(c = \frac{K_t}{L_aJ}\)\hfill} \([.]\) }
+	\end{itemize}
+	We get lamped Parameter in a simplified form as:
+	\begin{equation}
+		\Rightarrow \boxed{\ddot{\omega}(t) = - a\dot{\omega}(t) - b\omega(t) + cv_a(t)}
+		\label{eq16}
+	\end{equation}
+
+	\subsection{With Friction}
+	From \autoref{eq4} and \autoref{eq10}, we have:
+	\[\begin{split}
+		v_a(t) &= K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt} \\
+		i_a(t) &= \frac{T_c sign[\omega(t)] +D\omega(t) + J \dot{\omega}(t)}{K_t}
+	\end{split}\]
+	\[\begin{split}
+		\frac{di_a(t)}{d(t)} &= \frac{d}{dt}\left(\frac{T_c sign[\omega(t)] +D\omega(t) + J \dot{\omega}(t)}{K_t}\right) \\
+		&= \frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t)) \leftarrow \text{derivative of sign function is 0}
+	\end{split}\]
+	We get:
+	\begin{equation}
+		v_a(t) = K_b \omega(t) + R_a \frac{T_c sign[\omega(t)] + D\omega(t) + J \dot{\omega}(t)}{K_t} + L_a\frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t))
+		\label{eq17}
+	\end{equation}
+	\[\begin{split}
+		K_tv_a(t) &= K_tK_b \omega(t) + R_aT_c sign[\omega(t)] + R_aD\omega(t) + R_aJ \dot{\omega}(t)) + L_a D\dot{\omega}(t) + L_a J \ddot{\omega}(t) \\
+		\ddot{\omega}(t) &= - \frac{R_a J + L_a D}{L_aJ} \dot{\omega}(t) -\frac{K_tK_b + R_a D}{L_aJ} \omega(t)  + \frac{K_t}{L_aJ}v_a(t) - \frac{R_aT_c}{L_aJ} sign[\omega(t)]\\
+	\end{split}\]
+	Let:
+	\begin{itemize}
+		\item {\makebox[4cm]{\(a = \frac{R_a J + L_a D}{L_aJ}\)\hfill} \([.]\) }
+		\item {\makebox[4cm]{\(b = \frac{K_tK_b + R_a D}{L_aJ}\)\hfill} \([.]\) }
+		\item {\makebox[4cm]{\(c = \frac{K_t}{L_aJ}\)\hfill} \([.]\) }
+		\item {\makebox[4cm]{\(d = \frac{R_aT_c}{L_aJ}\)\hfill} \([.]\) }
+	\end{itemize}
+	We get lamped Parameter in a simplified form as:
+	\begin{equation}
+		\Rightarrow \boxed{\ddot{\omega}(t) = - a\dot{\omega}(t) - b\omega(t) + cv_a(t) - dsign(\omega(t))}
+		\label{eq18}
+	\end{equation}
 \end{document}
