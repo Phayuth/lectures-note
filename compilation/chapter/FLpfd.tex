@@ -1,0 +1,251 @@
+\chapter{Partial Fraction Decomposition}
+Usually we have a Function:
+\[
+F(s) = \frac{A(s)}{B(s)}
+\]
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(A(s)\)\hfill} is a polynomial which order is smaller than \(B(s)\)}
+	\item {\makebox[1cm]{\(B(s)\)\hfill} is a polynomial which order is greater than \(A(s)\)}
+\end{itemize}
+To perform the Partial Fraction Decomposition, first we have to get \(F(s)\) into the ZPK (Zero, Pole, Gain) format which is:
+\[
+F(s) = \frac{K (s+z_1)(s+z_2)(s+z_3)...(s+z_n)}{(s+p_1)(s+p_2)(s+p_3)...(s+p_n)}
+\]
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(z\)\hfill} is roots of \(A(s)\) that is the zeros of \(F(s)\)}
+	\item {\makebox[1cm]{\(p\)\hfill} is roots of \(B(s)\) that is the poles of \(F(s)\)}
+\end{itemize}
+Given denominator of \(F(s)\), determine the pole of the polynomial \((s+p_1)...(s+p_n)\). From the result we can divide into 3 cases.
+\section{Case 1: Distinct Real Poles}
+\begin{tcolorbox}[title=Method]
+	In this case we can propose that the \(F(s) = \frac{A(s)}{B(s)}\) can be written into:
+	\[
+	F(s) = \frac{a_1}{s+p_1} + \frac{a_2}{s+p_2} + ... + \frac{a_n}{s+p_n}
+	\]
+\end{tcolorbox}
+
+\paragraph{Example}
+\[
+F(s) = \frac{s^2+8s+15}{s^3+3s^2+2s}
+\]
+We can see that Nominator order is greater than Denominator order. And the denominator \(s^3+3s^2+2s\) has the roots \(s_1=0 , s_2=-2 , s_3=-1 \rightarrow p_1=0, p_2=2, p_3=1\). Thus we have:
+\[
+F(s) = \frac{s^2+8s+15}{s^3+3s^2+2s} = \frac{s^2+8s+15}{(s+0)(s+2)(s+1)} = \frac{a_1}{s+0} + \frac{a_2}{s+2} + \frac{a_3}{s+1} 
+\]
+So we have to find \(a_1,a_2,a_3\) to make it work. We can use 2 methods to do it.
+
+\paragraph{Method 1} Multiplication
+
+\[
+\frac{s^2+8s+15}{s(s+2)(s+1)} = \frac{a_1}{s} + \frac{a_2}{s+2} + \frac{a_3}{s+1} 
+\]
+Multiply both side in terms of \(a_1\) \((s)\):
+\[
+\begin{split}
+	s(\frac{s^2+8s+15}{s(s+2)(s+1)}) &= s\frac{a_1}{s} + s\frac{a_2}{s+2} + s\frac{a_3}{s+1} \\
+	\frac{s^2+8s+15}{(s+2)(s+1)} &= a_1 + s\frac{a_2}{s+2} + s\frac{a_3}{s+1}
+\end{split}
+\]
+Substitute \(s=0\)
+\[
+\begin{split}
+	\frac{0+0+15}{(0+2)(0+1)} &= a_1 + 0 + 0 \\
+	a_1 &= \frac{15}{2}
+\end{split}
+\]
+Multiply both side in terms of \(a_2\) \((s+2)\):
+\[
+\begin{split}
+	(s+2)(\frac{s^2+8s+15}{s(s+2)(s+1)}) &= (s+2)\frac{a_1}{s} + (s+2)\frac{a_2}{s+2} + (s+2)\frac{a_3}{s+1} \\
+	\frac{s^2+8s+15}{(s)(s+1)} &= (s+2)\frac{a_1}{s} + a_2 + (s+2)\frac{a_3}{s+1}
+\end{split}
+\]
+Substitute \(s=-2\)
+\[
+\begin{split}
+	\frac{(-2)^2+8(-2)+15}{(-2)(-2+1)} &= (-2+2)\frac{a_1}{-2} + a_2 + (-2+2)\frac{a_3}{-2+1} \\
+	\frac{4-16+15}{2} &= 0 + a_2 + 0 \\
+	a_2 &= \frac{3}{2}
+\end{split}
+\]
+Multiply both side in terms of \(a_3\) \((s+1)\):
+\[
+\begin{split}
+	(s+1)(\frac{s^2+8s+15}{s(s+2)(s+1)}) &= (s+1)\frac{a_1}{s} + (s+1)\frac{a_2}{s+2} + (s+1)\frac{a_3}{s+1} \\
+	\frac{s^2+8s+15}{(s)(s+2)} &= (s+1)\frac{a_1}{s} + (s+1)\frac{a_2}{s+2} + a_3 \\
+\end{split}
+\]
+Substitute \(s=-1\)
+\[
+\begin{split}
+	\frac{(-1)^2+8(-1)+15}{(-1)(-1+2)} &= (-1+1)\frac{a_1}{-1} + (-1+1)\frac{a_2}{-1+2} + a_3 \\
+	\frac{1+-8+15}{-1} &= 0 + 0 + a_3 \\
+	a_3 &= -8
+\end{split}
+\]
+So we get:
+\[
+\boxed{F(s) = \frac{s^2+8s+15}{s^3+3s^2+2s} = \frac{\frac{15}{2}}{s} + \frac{\frac{3}{2}}{s+2} + \frac{-8}{s+1}}
+\]
+
+\paragraph{Method 2} Coefficient
+
+\[
+\frac{s^2+8s+15}{s(s+2)(s+1)} = \frac{a_1}{s} + \frac{a_2}{s+2} + \frac{a_3}{s+1} 
+\]
+Get the right-hand side denominator the same as left-hand side.
+\[
+\begin{split}
+	\frac{s^2+8s+15}{s(s+2)(s+1)} &= \frac{(s+1)(s+2)a_1+s(s+1)a_2+s(s+2)a_3}{s(s+2)(s+1)} \\
+	s^2+8s+15 &= (s+1)(s+2)a_1+s(s+1)a_2+s(s+2)a_3 \\
+	&= (s^2+2s+s+2)a_1 + (s^2+s)a_2 + (s^2+2s)a_3 \\
+	&= (s^2+3s+2)a_1 + (s^2+s)a_2 + (s^2+2s)a_3 \\
+	&= s^2a_1+3sa_1+2a_1 + s^2a_2+sa_2 + s^2a_3+2sa_3 \\
+	s^2+8s+15 &= s^2(a_1+a_2+a_3) + s(3a_1+a_2+2a_3) + (2a_1)\\
+	1 &= a_1+a_2+a_3 \\
+	8 &= 3a_1+a_2+2a_3 \\
+	15 &= 2a_1 \\
+	a_1 &= \frac{15}{2} \\
+	a_2 &= \frac{3}{2} \\
+	a_3 &= -8
+\end{split}
+\]
+So we get:
+\[
+\boxed{F(s) = \frac{s^2+8s+15}{s^3+3s^2+2s} = \frac{\frac{15}{2}}{s} + \frac{\frac{3}{2}}{s+2} + \frac{-8}{s+1}}
+\]
+
+\section{Case 2: Repeated Real Poles}
+\begin{tcolorbox}[title=Method]
+	In this case we can propose that the \(F(s) = \frac{A(s)}{B(s)}\) can be written into:
+	\[
+	F(s) = \frac{a_1}{s+p} + \frac{a_2}{(s+p)^2} + ... + \frac{a_n}{(s+p)^n}
+	\]
+\end{tcolorbox}
+
+\paragraph{Example}
+\[
+F(s) = \frac{s^2+2s+3}{(s+1)^3}
+\]
+The denominator \((s+1)^3\) has a repeated real pole at \(p=-1\). \(F(s)\) can be written as:
+\[
+F(s) = \frac{s^2+2s+3}{(s+1)^3} = \frac{a_1}{s+1} + \frac{a_2}{(s+1)^2} + \frac{a_3}{(s+1)^3}
+\]
+
+\paragraph{Method 1} Coefficient
+
+Determine \(a_1,a_2,a_3\)
+\[
+\begin{split}
+	\frac{s^2+2s+3}{(s+1)^3} &= \frac{(s+1)^2a_1}{(s+1)^2(s+1)} + \frac{(s+1)a_2}{(s+1)(s+1)^2} + \frac{a_3}{(s+1)^3} \\
+	\frac{s^2+2s+3}{(s+1)^3} &= \frac{(s+1)^2a_1+(s+1)a_2+a_3}{(s+1)^3} \\
+	s^2+2s+3 &= (s+1)^2a_1+(s+1)a_2+a_3 \\
+	s^2+2s+3 &= s^2 a_1 + 2s a_1 + a_1+ sa_2 + a_2 + a_3 \\
+	s^2+2s+3 &= s^2 a_1 + s(2a_1+a_2) + (a_1+a_2+a_3)\\
+\end{split}
+\]
+\[
+\begin{split}
+	1 &= a_1 \\
+	2 &= 2a_1+a_2 \\
+	3 &= a_1+a_2+a_3 \\
+	\rightarrow a_1 &= 1 \\
+	\rightarrow a_2 &= 0 \\
+	\rightarrow a_3 &= 2
+\end{split}
+\]
+Thus we get:
+\[
+\boxed{
+	F(s) = \frac{s^2+2s+3}{(s+1)^3} = \frac{1}{s+1} + \frac{0}{(s+1)^2} + \frac{2}{(s+1)^3} = \frac{1}{s+1} + \frac{2}{(s+1)^3}}
+\]
+
+\paragraph{Method 2} Derivative
+
+From finding the common denominator above:
+\[
+s^2+2s+3 = (s+1)^2a_1+(s+1)a_2+a_3 
+\]
+Substitute \(s = -1\)
+\[
+\begin{split}
+	(-1)^2+2(-1)+3 &= (-1+1)^2a_1+(-1+1)a_2+a_3 \\
+	(-1)^2+2(-1)+3 &= 0+0+a_3 \\
+	a_3 &= 2
+\end{split}
+\]
+Take derivative of \(s^2+2s+3 = (s+1)^2a_1+(s+1)a_2+a_3\) both side, we get:
+\[
+2s+2 = 2(s+1)a_1+a_2
+\]
+Substitute \(s = -1\)
+\[
+\begin{split}
+	2(-1)+2 &= 2(-1+1)a_1+a_2 \\
+	2(-1)+2 &= 0+a_2 \\
+	a_2 &= 0
+\end{split}
+\]
+Take derivative of \(2s+2 = 2(s+1)a_1+a_2\) both side, we get:
+\[
+\begin{split}
+	2 &= 2a_1 \\
+	a_1 &= 1
+\end{split}
+\]
+Thus we get:
+\[
+\boxed{
+	F(s) = \frac{s^2+2s+3}{(s+1)^3} = \frac{1}{s+1} + \frac{0}{(s+1)^2} + \frac{2}{(s+1)^3} = \frac{1}{s+1} + \frac{2}{(s+1)^3}}
+\]
+
+
+
+\section{Case 3: Complex Conjugate Poles}
+\begin{tcolorbox}[title=Method]
+In this case we can propose that the \(F(s) = \frac{A(s)}{B(s)}\) can be written into:
+\[
+F(s) = \frac{A(s)}{(s+\alpha)^2+\omega^2}
+\]
+Where from general denominator:
+\[
+s^2 + ds + e = 0
+\]
+\[
+\begin{split}
+	\alpha &= \frac{d}{2} \\
+	\omega &= \frac{\sqrt{4e-d^2}}{2}
+\end{split}
+\]
+\end{tcolorbox}
+
+\paragraph{Example}
+\[
+F(s) = \frac{s-1}{s^2+2s+2}
+\]
+From denominator \(s^2+2s+2\) in general form \(d = 2, e = 2\), we get:
+\[
+\begin{split}
+	\alpha &= 1 \\
+	\omega &= 1
+\end{split}
+\]
+Thus:
+\[\boxed{
+	F(s) = \frac{s-1}{s^2+2s+2} = \frac{s-1}{(s+1)^2+1^2}}
+\]
+\section{Improper Complex Function}
+\begin{tcolorbox}[title=Method]
+We have a transfer function:
+\[
+F(s) = \frac{A(s)}{B(s)}
+\]
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(A(s)\)\hfill} is a polynomial which order is greater than \(B(s)\)}
+	\item {\makebox[1cm]{\(B(s)\)\hfill} is a polynomial which order is smaller than \(A(s)\)}
+\end{itemize}
+We can use synthetic division to make the \(A(s)\) smaller than \(B(s)\) (Polynomial Equation division).
+\end{tcolorbox}

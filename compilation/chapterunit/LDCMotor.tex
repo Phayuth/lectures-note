@@ -1,0 +1,259 @@
+\chapter{DC Motor}
+DC motor is a mechatronic product that consist of two parts: the mechanical part and the electrical part. A typical dc motor used by a robot is constructed by: a dc motor, a wheel encoder (for measuring rotation pulse of motor ), and a gear box (for reducing the speed of motor).
+
+
+\begin{figure}[h]
+	\centering
+	%\def\svgscale{1}
+	\includesvg{src/dcmotor/dcmotor_fig1}
+	\caption{Typical DC Motor}
+	\label{fig:dcmotor}
+\end{figure}
+
+\section{Modelling}
+
+\begin{figure}[h]
+	\centering
+	%\def\svgscale{1}
+	\includesvg{src/dcmotor/dcmotor_fig2}
+	\caption{dc motor model}
+	\label{fig:dc motor model}
+\end{figure}
+
+\subsection{Electrical Part}
+\begin{equation}
+	v_b(t) = K_b \dot{\theta}(t) = K_b \omega(t)
+	\label{dcmotoreq1}
+\end{equation}
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(v_b(t)\)\hfill} is voltage at terminal conductor of motor }
+	\item {\makebox[1cm]{\(K_b\)\hfill} is back emf constant}
+	\item {\makebox[1cm]{\(\dot{\theta} = \omega\)\hfill} is angular velocity of motor}
+\end{itemize}
+
+\begin{equation}
+	T_a = K_t i_a(t)
+	\label{dcmotoreq2}
+\end{equation}
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(T_a\)\hfill} is rotor torque }
+	\item {\makebox[1cm]{\(K_t\)\hfill} is motor torque}
+	\item {\makebox[1cm]{\(i_a\)\hfill} is the current draw by motor}
+\end{itemize}
+\hfill\\
+By applying Kirchoff Voltage Law to the circuit loop in \autoref{fig:dc motor model}
+\begin{itemize}
+	\item {\makebox[3.5cm]{\(v_a(t)\)\hfill} is input voltage from power source}
+	\item {\makebox[3.5cm]{\(v_{resistance} = R_a i_a(t)\)\hfill} is voltage across resistance}
+	\item {\makebox[3.5cm]{\(v_{inductor} = L_a \frac{di_a(t)}{dt}\)\hfill} is voltage across inductor}
+\end{itemize}
+
+\[v_a(t) - v_b(t) - R_a i_a(t) - L_a \frac{di_a(t)}{dt} = 0\]
+
+\begin{equation}
+	\Rightarrow v_a(t) = v_b(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt}
+	\label{dcmotoreq3}
+\end{equation}
+Substitute \autoref{dcmotoreq1} into \autoref{dcmotoreq3}, we get:
+
+\begin{equation}
+	v_a(t) = K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt}
+	\label{dcmotoreq4}
+\end{equation}
+In practical dc motor the \(L_a\) is very small (\(L_a \approx 0\)) and neglectable.
+
+\[v_a(t) = K_b \omega(t) + R_a i_a(t)\]
+
+\begin{equation}
+	\Rightarrow \boxed{i_a(t) = \frac{v_a(t) - K_b \omega(t)}{R_a}}
+	\label{dcmotoreq5}
+\end{equation}
+
+\subsection{Mechanical Part}
+
+\begin{equation}
+	T_a = T_f + J \dot{\omega}(t)
+	\label{dcmotoreq6}
+\end{equation}
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(T_f\)\hfill} is torque of coulomb friction and viscous friction }
+	\item {\makebox[1cm]{\(J\)\hfill} is moment of inertia}
+\end{itemize}
+We know that:
+\begin{equation}
+	T_f = T_c sign[\omega(t)]+D\omega(t)
+	\label{dcmotoreq7}
+\end{equation}
+Where:
+\begin{itemize}
+	\item {\makebox[1cm]{\(T_c\)\hfill} is coulomb friction torque}
+	\item {\makebox[1cm]{\(D\)\hfill} is coefficient viscous friction}
+\end{itemize}
+Substitute \autoref{dcmotoreq7} to \autoref{dcmotoreq6}, we get:
+\[T_a = T_c sign[\omega(t)]+D\omega(t) + J \dot{\omega}(t)\]
+
+\subsection{Approximation of coulomb friction to zero \(T_c \approx 0\)}
+\begin{equation}
+	T_a = D\omega(t) + J \dot{\omega}(t)
+	\label{dcmotoreq8}
+\end{equation}
+From \autoref{dcmotoreq2}: \(T_a = K_t i_a(t)\) substitute to \autoref{dcmotoreq8}:
+\[K_t i_a(t) = D\omega(t) + J \dot{\omega}(t)\]
+\begin{equation}
+	\Rightarrow \boxed{i_a(t) = \frac{D\omega(t) + J \dot{\omega}(t)}{K_t}}
+	\label{dcmotoreq9}
+\end{equation}
+
+\subsection{Keep coulomb friction \(T_c\)}
+\begin{equation}
+	\Rightarrow \boxed{i_a(t) = \frac{T_c sign[\omega(t)] + D\omega(t) + J \dot{\omega}(t)}{K_t}}
+	\label{dcmotoreq10}
+\end{equation}
+
+\subsection{Electrical and Mechanical combine}
+\subsection{Approximation of coulomb friction to zero \(T_c \approx 0\)}
+
+From \autoref{dcmotoreq5} and \autoref{dcmotoreq9}: Put it side by side:
+
+\[i_a(t) = i_a(t)\]
+\[\frac{v_a(t) - K_b \omega(t)}{R_a} = \frac{D\omega(t) + J \dot{\omega}(t)}{K_t}\]
+Get \(\dot{\omega}(t)\):
+
+\[\dot{\omega}(t) = \frac{\frac{(v_a(t) - K_b \omega(t))K_t}{R_a} - D\omega(t)}{J}\]
+\[\dot{\omega}(t) = \frac{(v_a(t) - K_b \omega(t))K_t}{R_a J} - \frac{D\omega(t)}{J}\]
+\[\dot{\omega}(t) = \frac{v_a(t) K_t - K_b K_t\omega(t)}{R_a J} - \frac{D\omega(t)}{J}\]
+Separate \(\omega(t)\) and \(v_a(t)\):
+
+\begin{tcolorbox}[title=Lumped Parameters without Friction]
+	\begin{equation}
+		\dot{\omega}(t) = - (\frac{K_b K_t + D R_a}{R_a J})\omega(t) + \frac{K_t}{R_a J}v_a(t)
+		\label{dcmotoreq11}
+	\end{equation}
+	Let:
+	\begin{itemize}
+		\item {\makebox[4cm]{\(a = (\frac{K_b K_t + D R_a}{R_a J}) \omega(t)\)\hfill} \([1/s]\) }
+		\item {\makebox[4cm]{\(b = \frac{K_t}{R_a J}\)\hfill} \([rad/s^2/V]\) }
+	\end{itemize}
+	We get lumped Parameter in a simplified form as:
+	\begin{equation}
+		\Rightarrow \dot{\omega}(t) = - a\omega(t) + bv_a(t)
+		\label{dcmotoreq12}
+	\end{equation}
+\end{tcolorbox}
+
+
+
+\subsection{Keep coulomb friction \(T_c\)}
+\begin{tcolorbox}[title=Lumped Parameters with Friction]
+	\begin{equation}
+		\dot{\omega}(t) = - (\frac{K_b K_t + D R_a}{R_a J})\omega(t) + \frac{K_t}{R_a J}v_a(t) - \frac{T_c}{J}sign(\omega(t))
+		\label{dcmotoreq13}
+	\end{equation}
+	Let:
+	\begin{itemize}
+		\item {\makebox[4cm]{\(a = (\frac{K_b K_t + D R_a}{R_a J})\)\hfill} \([1/s]\) }
+		\item {\makebox[4cm]{\(b = \frac{K_t}{R_a J}\)\hfill} \([rad/s^2/V]\) }
+		\item {\makebox[4cm]{\(c = \frac{T_c}{J}\)\hfill} \([.]\) }
+	\end{itemize}
+	We get lumped Parameter in a simplified form as:
+	\begin{equation}
+		\Rightarrow \dot{\omega}(t) = - a\omega(t) + bv_a(t) - csign(\omega(t))
+		\label{dcmotoreq14}
+	\end{equation}
+\end{tcolorbox}
+
+
+\section{Simulation}
+
+In general, the equation \(\dot{\omega}(t) = - a\omega(t) + bv_a(t) - csign(\omega(t)\) is used to represent all the dc motor in the market. By modifying the parameters \(a, b, c\) will result in different dc motor.
+From equation \(\dot{\omega}(t) = - a\omega(t) + bv_a(t) - csign(\omega(t))\)
+\begin{itemize}
+	\item {\makebox[1cm]{\(\dot{\omega}(t)\)\hfill} is the angular acceleration of dc motor and is the output of the system}
+	\item {\makebox[1cm]{\(\omega(t)\) \hfill} is the angular velocity of dc motor and is the output of the system}
+	\item {\makebox[1cm]{\(v_a(t)\)\hfill} is the input voltage to dc motor and is the input of the system}
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	
+	%def\svgscale{1}
+	\includesvg{src/dcmotor/dcmotor_fig3}
+	\caption{Simulation Flow}
+	\label{fig:Simulation Flow}
+\end{figure}
+
+
+\section{DC Motor 2nd Order Model ($ L_a $ is not Neglected)}
+\subsection{No Friction}
+From \autoref{dcmotoreq4} and \autoref{dcmotoreq9}, we have:
+\[\begin{split}
+	v_a(t) &= K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt} \\
+	i_a(t) &= \frac{D\omega(t) + J \dot{\omega}(t)}{K_t}
+\end{split}\]
+\[\begin{split}
+	\frac{di_a(t)}{d(t)} &= \frac{d}{dt}\left(\frac{D\omega(t) + J \dot{\omega}(t)}{K_t}\right) \\
+	&= \frac{1}{K_t}\frac{d}{dt}(D\omega(t) + J \dot{\omega}(t))\\
+	&= \frac{1}{K_t} \frac{d}{dt}(D\omega(t)) + \frac{d}{dt}(J \dot{\omega}(t)) \\
+	&= \frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t))
+\end{split}\]
+We get:
+\begin{equation}
+	v_a(t) = K_b \omega(t) + R_a \frac{D\omega(t) + J \dot{\omega}(t)}{K_t} + L_a\frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t))
+	\label{dcmotoreq15}
+\end{equation}
+\[\begin{split}
+	K_tv_a(t) &= K_tK_b \omega(t) + R_a (D\omega(t) + J \dot{\omega}(t)) + L_a (D\dot{\omega}(t) + J \ddot{\omega}(t)) \\
+	K_tv_a(t) &= K_tK_b \omega(t) + R_a D\omega(t) + R_a J \dot{\omega}(t) + L_a D\dot{\omega}(t) + L_aJ \ddot{\omega}(t) \\
+	K_tv_a(t) &= (K_tK_b + R_a D) \omega(t) + (R_a J + L_a D) \dot{\omega}(t) + L_aJ \ddot{\omega}(t) \\
+	L_aJ \ddot{\omega}(t) &= -(K_tK_b + R_a D) \omega(t) - (R_a J + L_a D) \dot{\omega}(t) + K_tv_a(t) \\
+\end{split}\]
+\begin{tcolorbox}[title=Lumped Parameters without Friction 2nd Order]
+	\[\ddot{\omega}(t) = - \frac{R_a J + L_a D}{L_aJ} \dot{\omega}(t) -\frac{K_tK_b + R_a D}{L_aJ} \omega(t)  + \frac{K_t}{L_aJ}v_a(t)\]
+	Let:
+	\[
+	a = \frac{R_a J + L_a D}{L_aJ} , b = \frac{K_tK_b + R_a D}{L_aJ} , c = \frac{K_t}{L_aJ}
+	\]
+	We get lumped Parameter in a simplified form as:
+	\begin{equation}
+		\Rightarrow \ddot{\omega}(t) = - a\dot{\omega}(t) - b\omega(t) + cv_a(t)
+		\label{dcmotoreq16}
+	\end{equation}
+\end{tcolorbox}
+
+
+\subsection{With Friction}
+From \autoref{dcmotoreq4} and \autoref{dcmotoreq10}, we have:
+\[\begin{split}
+	v_a(t) &= K_b \omega(t) + R_a i_a(t) + L_a \frac{di_a(t)}{dt} \\
+	i_a(t) &= \frac{T_c sign[\omega(t)] +D\omega(t) + J \dot{\omega}(t)}{K_t}
+\end{split}\]
+\[\begin{split}
+	\frac{di_a(t)}{d(t)} &= \frac{d}{dt}\left(\frac{T_c sign[\omega(t)] +D\omega(t) + J \dot{\omega}(t)}{K_t}\right) \\
+	&= \frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t)) \leftarrow \text{derivative of sign function is 0}
+\end{split}\]
+We get:
+\begin{equation}
+	v_a(t) = K_b \omega(t) + R_a \frac{T_c sign[\omega(t)] + D\omega(t) + J \dot{\omega}(t)}{K_t} + L_a\frac{1}{K_t} (D\dot{\omega}(t) + J \ddot{\omega}(t))
+	\label{dcmotoreq17}
+\end{equation}
+\[
+K_tv_a(t) = K_tK_b \omega(t) + R_aT_c sign[\omega(t)] + R_aD\omega(t) + R_aJ \dot{\omega}(t)) + L_a D\dot{\omega}(t) + L_a J \ddot{\omega}(t)
+\]
+
+\begin{tcolorbox}[title=Lumped Parameters with Friction 2nd Order]
+	\[
+	\ddot{\omega}(t) = - \frac{R_a J + L_a D}{L_aJ} \dot{\omega}(t) -\frac{K_tK_b + R_a D}{L_aJ} \omega(t)  + \frac{K_t}{L_aJ}v_a(t) - \frac{R_aT_c}{L_aJ} sign[\omega(t)]
+	\]
+	Let:
+	\[
+	a = \frac{R_a J + L_a D}{L_aJ}, b = \frac{K_tK_b + R_a D}{L_aJ}, c = \frac{K_t}{L_aJ}, d = \frac{R_aT_c}{L_aJ}
+	\]
+	We get lamped Parameter in a simplified form as:
+	\begin{equation}
+		\Rightarrow \ddot{\omega}(t) = - a\dot{\omega}(t) - b\omega(t) + cv_a(t) - dsign(\omega(t))
+		\label{dcmotoreq18}
+	\end{equation}
+\end{tcolorbox}

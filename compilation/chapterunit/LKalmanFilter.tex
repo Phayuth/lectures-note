@@ -1,0 +1,161 @@
+\chapter{Kalman Filter}
+Kalman Filter was found by Dr. Rudolf Emil Kálmán. This algorithm is a powerful filtering algorithm that has been used in many applications most notably in signal processing, control, optimization, sensor fusion, system identification -etc , and it is able to be implemented online.
+
+\section{Kalman Filter (Linear System)}
+	Consider a linear discrete time system as following:
+	\begin{equation}
+		\begin{split}
+			x_{k+1} &= Ax_k + Bu_k + v_k \\
+			y_{k+1} &= Cx_{k+1} + Du_{k+1} + w_{k+1}
+		\end{split}
+		\label{kfeq1}
+	\end{equation}
+	Where:
+	\begin{itemize}
+		\item {\makebox[1cm]{\(x_k\)\hfill} \(\in \mathbb{R}^{n_x}\) state system}
+		\item {\makebox[1cm]{\(u_k\)\hfill} \(\in \mathbb{R}^{n_u}\) input system}
+		\item {\makebox[1cm]{\(y_k\)\hfill} \(\in \mathbb{R}^{n_z}\) measurement system}
+		\item {\makebox[1cm]{\(A\)\hfill} \(\in \mathbb{R}^{n_x \times n_x}\) system matrix}
+		\item {\makebox[1cm]{\(C\)\hfill} \(\in \mathbb{R}^{n_z \times n_x}\) observation matrix}
+		\item {\makebox[1cm]{\(B\)\hfill} \(\in \mathbb{R}^{n_x \times n_u}\) some matrix}
+		\item {\makebox[1cm]{\(D\)\hfill} \(\in \mathbb{R}^{n_z \times n_u}\) some matrix}
+		\item {\makebox[1cm]{\(v_k\)\hfill} \(\in \mathbb{R}^{n_x}\) independent process noises}
+		\item {\makebox[1cm]{\(w_k\)\hfill} \(\in \mathbb{R}^{n_z}\) independent measurement noises}
+		\item {\makebox[1cm]{\(Q\)\hfill} \(\in \mathbb{R}^{n_x \times n_x}\) Gaussian covariance matrix of \(v\)}
+		\item {\makebox[1cm]{\(R\)\hfill} \(\in \mathbb{R}^{n_z \times n_z}\) Gaussian covariance matrix of \(w\)}
+	\end{itemize}
+	\begin{center}
+		\textbf{Apply Kalman Filter on the system}
+	\end{center}
+	\paragraph{Initialize} Select any
+	\begin{itemize}
+		\item {\makebox[1cm]{\(\hat{x}_{0|0}\)\hfill} initial state estimate}
+		\item {\makebox[1cm]{\(P_{0|0}\)\hfill} positive definite error covariance matrix}
+	\end{itemize}
+	\paragraph{Time Update}
+	\begin{equation}
+		\begin{split}
+			\hat{x}_{k+1|k} = A\hat{x}_{k|k} + Bu_k \\
+			P_{k+1|k} = AP_{k|k}A^T + Q
+		\end{split}
+		\label{kfeq2}
+	\end{equation}
+	\paragraph{Measurement Update}
+	\begin{equation}
+		\begin{split}
+			\hat{y}_{k+1|k} &= C\hat{x}_{k+1|k} + Du_{k+1} \\
+			P_{xy,k+1|k} &= P_{k+1|k}C^T  \\
+			P_{yy,k+1|k} &= CP_{k+1|k}C^T + R \\
+			\hat{x}_{k+1|k+1} &= \hat{x}_{k+1|k} + P_{xy,k+1|k}P^{-1}_{yy,k+1|k}(y_k - \hat{y}_{k+1|k}) \\
+			P_{k+1|k+1} &= P_{k+1|k} - P_{xy,k+1|k}P^{-1}_{yy,k|k+1}P^T_{xy,k+1|k}
+		\end{split}
+		\label{kfeq3}
+	\end{equation}
+	In terms of Kalman Gain,
+	\begin{equation}
+		\begin{split}
+			K_{k+1} &= P_{xy,k+1|k}P^{-1}_{yy,k+1|k}\\
+			\hat{x}_{k+1|k+1} &= \hat{x}_{k+1|k} + K_{k+1}(y_{k+1} - C\hat{x}_{k+1|k} - Du_{k+1}) \\
+			P_{k+1|k+1} &= P_{k+1|k} - K_{k+1} P_{yy,k+1|k}K^T_{k+1}
+		\end{split}
+		\label{kfeq4}
+	\end{equation}
+	\section{Extended Kalman Filter (Nonlinear System)}
+	Consider a nonlinear discrete time system as following:
+	\begin{equation}
+		\begin{split}
+			x_{k+1} &= f_d(x_k+u_k) + v_k \\
+			y_{k+1} &= h_d(x_{k+1},u_{k+1}) + w_{k+1}
+		\end{split}
+		\label{kfeq5}
+	\end{equation}
+	Where:
+	\begin{itemize}
+		\item {\makebox[1cm]{\(x_k\)\hfill} \(\in \mathbb{R}^{n_x}\) state system at discrete time}
+		\item {\makebox[1cm]{\(u_k\)\hfill} \(\in \mathbb{R}^{n_u}\) input system}
+		\item {\makebox[1cm]{\(y_k\)\hfill} \(\in \mathbb{R}^{n_z}\) measurement}
+		\item {\makebox[1cm]{\(f_d\)\hfill} some known function}
+		\item {\makebox[1cm]{\(h_d\)\hfill} some known function}
+		\item {\makebox[1cm]{\(v_k\)\hfill} \(\in \mathbb{R}^{n_x}\) independent process noises}
+		\item {\makebox[1cm]{\(w_k\)\hfill} \(\in \mathbb{R}^{n_z}\) independent measurement noises}
+	\end{itemize}
+	\begin{center}
+		\textbf{Apply Extended Kalman Filter on the system}
+	\end{center}
+	\paragraph{Initialize} Select any
+	\begin{itemize}
+		\item {\makebox[1cm]{\(\hat{x}_{0|0}\)\hfill} initial state estimate}
+		\item {\makebox[1cm]{\(P_{0|0}\)\hfill} positive definite error covariance matrix}
+	\end{itemize}
+	\paragraph{Time Update}
+	\begin{equation}
+		\begin{split}
+			\hat{x}_{k+1|k} &= f_d(\hat{x}_{k|k},u_k) \\
+			P_{k+1|k} &= A_kP_{k|k}A^T_k+Q
+		\end{split}
+		\label{kfeq6}
+	\end{equation}
+	\paragraph{Measurement Update}
+	\begin{equation}
+		\begin{split}
+			\hat{y}_{k+1|k} &= h_d(\hat{x}_{k+1|k},u_{k+1})\\
+			P_{xy,k+1|k}    &= P_{k+1|k}C^T_{k+1}\\
+			P_{yy,k+1|k}    &= C_{k+1}P_{k+1|k}C^T_{k+1}+R\\
+			\hat{x}_{k+1|k+1} &= \hat{x}_{k+1|k} + P_{xy,k+1|k}P^{-1}_{yy,k+1|k}(y_{k+1}-\hat{y}_{k+1|k})\\
+			P_{k+1|k+1}     &= P_{k+1|k} - P_{xy,k+1|k}P^{-1}_{yy,k|k+1}P^T_{xy,k+1|k} 
+		\end{split}
+		\label{kfeq7}
+	\end{equation}
+	In terms of Kalman Gain,
+	\begin{equation}
+		\begin{split}
+			K_{k+1} &= P_{xy,k+1|k}P^{-1}_{yy,k+1|k}\\
+			\hat{x}_{k+1|k+1} &= \hat{x}_{k+1|k} + K_{k+1}[y_{k+1} - h_d(\hat{x}_{k+1|k},u_{k+1})] \\
+			P_{k+1|k+1} &= P_{k+1|k} - K_{k+1} P_{yy,k+1|k}K^T_{k+1}
+		\end{split}
+		\label{kfeq8}
+	\end{equation}
+	Where from linearization of nonlinear function $f_d$ and $h_d$ using a Taylor series expansion, We get Jacobian matrix:
+	\[A_k = \frac{\partial f_d}{\partial x}|_{x=\hat{x}_{k|k}}\]
+	\[C_{k+1} = \frac{\partial h_d}{\partial x}|_{x=\hat{x}_{k+1|k}}\]
+	\section{Unscented Kalman Filter (Nonlinear System)}
+	Consider a nonlinear discrete time system as following:
+	\begin{equation}
+		\begin{split}
+			x_{k+1} &= f_d(x_k+u_k) + v_k \\
+			y_{k+1} &= h_d(x_{k+1},u_{k+1}) + w_{k+1}
+		\end{split}
+		\label{kfeq9}
+	\end{equation}
+	\begin{center}
+		\textbf{Apply Unscented Kalman Filter on the system}
+	\end{center}
+	\paragraph{Initialize}
+	\begin{itemize}
+		\item {\makebox[1cm]{\(\hat{x}_{0|0}\)\hfill} initial state estimate}
+		\item {\makebox[1cm]{\(P_{0|0}\)\hfill} positive definite error covariance matrix}
+	\end{itemize}
+	\paragraph{Time Update}
+	\begin{equation}
+		\begin{split}
+			X_{k|k} &= [\hat{x}_{k|k}\quad ...\quad \hat{x}_{k|k}]+\sqrt{n_x + \lambda}[0\quad \sqrt{P_{k|k}}\quad -\sqrt{P_{k|k}}]\\
+			X_{k+1|k} &= f_d(X_{k|k},u_k)\\
+			\hat{x}_{k+1|k} &= X_{k+1|k}w_m\\
+			P_{k+1|k} &= X_{k+1|k}WX^T_{k+1|k} + Q
+		\end{split}
+		\label{kfeq10}
+	\end{equation}
+	\paragraph{Measurement Update}
+	\begin{equation}
+		\begin{split}
+			X^{(r)}_{k+1|k} &= [\hat{x}_{k+1|k}\quad ...\quad \hat{x}_{k+1|k}]+\sqrt{n_x + \lambda}[0\quad \sqrt{P_{k+1|k}}\quad -\sqrt{P_{k+1|k}}]\\
+			Y_{k+1|k} &= h_d(X^{(r)}_{k+1|k},u_{k+1})\\
+			\hat{y}_{k+1|k} &= Y_{k+1|k} w_m\\
+			P_{xy,k+1|k} &= X^{(r)}_{k+1|k}WY^T_{k+1|k}\\
+			P_{yy,k+1|k} &= Y_{k+1|k}WY^T_{k+1|k} + R \\
+			K_{k+1} &= P_{xy,k+1|k}P^{-1}_{yy,k+1|k}\\
+			\hat{x}_{k+1|k+1} &= \hat{x}_{k+1|k} + K_{k+1}(y_{k+1}-\hat{y}_{k+1|k})\\
+			P_{k+1|k+1} &= P_{k+1|k} - K_{k+1}P_{yy,k+1|k}K^T_{k+1}
+		\end{split}
+		\label{kfeq11}
+	\end{equation}

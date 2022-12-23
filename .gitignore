@@ -17,3 +17,6 @@
 *.fls
 *.run.xml
 *.synctex.gz
+
+
+svg-inkscape/
