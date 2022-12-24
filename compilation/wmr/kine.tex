@@ -1,0 +1,220 @@
+\chapter{Mobile Robot Kinematic}
+Kinematic is the study of position, velocity, acceleration of object in space without considering the forces that cause them to move. In mobile robot kinematic, we are interested in where is the location of robot in place and where is it facing.
+
+\section{Differential Drive Mobile Robot Kinematic}
+One of the most simple design robot and widely use is a type called Differential Drive. Our interest in this study is to know where is its location in space and at what time. And thus, we need to determine $x = [x,y,z]^T$.
+
+\begin{figure}[h]
+	\centering
+	%		\def\svgscale{1}
+	\includesvg{src/wmr/1diffdrive}
+	\caption{Differential Drive Robot}
+\end{figure}
+From the figure, we have:
+\begin{equation}
+	\begin{split}
+		\omega &= \frac{v}{R}\\
+		\omega &= \frac{v_l}{R-l/2}\\
+		\omega &= \frac{v_r}{R+l/2}
+	\end{split}
+\end{equation}
+Find $\omega$ in term of $v_r$ and $v_l$:
+\begin{equation}
+	\begin{split}
+		R = \frac{v_l}{\omega} + \frac{l}{2}\\
+		R = \frac{v_r}{\omega} - \frac{l}{2}\\
+		\frac{v_l}{\omega} + \frac{l}{2} = \frac{v_r}{\omega} - \frac{l}{2}\\
+		\omega = \frac{v_r - v_l}{l}
+	\end{split}
+\end{equation}
+Find $R$
+\begin{equation}
+	\begin{split}
+		\frac{v_l}{R-l/2} = \frac{v_r}{R+l/2}\\
+		v_r(R-l/2) = v_l(R+l/2) \\
+		R = \frac{v_r + v_l}{v_r - v_l}\frac{l}{2}
+	\end{split}
+\end{equation}
+Find $v$ in term of $v_r$ and $v_l$:
+\begin{equation}
+	\begin{split}
+		v = \omega R = \frac{v_r - v_l}{l} \frac{v_r + v_l}{v_r - v_l}\frac{l}{2}\\
+		v = \frac{v_r+v_l}{2}
+	\end{split}
+\end{equation}
+\begin{tcolorbox}[title={Relation of $v,\omega$ with $\omega_l,\omega_r$}]
+	We can have $v$ and $\omega$ in term of each wheel rotational speed $\omega_r$ and $\omega_l$ :
+	\begin{equation}
+		\begin{split}
+			v = \omega_r\frac{r}{2} + \omega_l\frac{r}{2}\\
+			\omega = \omega_r\frac{r}{l} - \omega_l\frac{r}{l}
+		\end{split}
+	\end{equation}
+	We can have $\omega_r$ and $\omega_l$ in term of $v$ and $\omega$ : 
+	\begin{equation}
+		\begin{split}
+			\omega_r = \frac{2v+l\omega}{2r}\\
+			\omega_l = \frac{2v-l\omega}{2r}
+		\end{split}
+	\end{equation}
+\end{tcolorbox}
+We have our internal kinematic
+\begin{equation}
+	\begin{bmatrix}
+		\dot{x}      \\
+		\dot{y}      \\
+		\dot{\theta} 
+	\end{bmatrix}=
+	\begin{bmatrix}
+		\frac{r}{2} & \frac{r}{2}  \\
+		0           & 0            \\
+		\frac{r}{l} & -\frac{r}{l} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+		\omega_r\\
+		\omega_l
+	\end{bmatrix}
+\end{equation}
+You may think why is that $y$ component doesn't have any element, because it's due to nonholonomic constraint. The robot could only move in $x$ direction and rotate around $z$ of its local frame.\par
+\begin{tcolorbox}[title=We have our external kinematic]
+	\begin{equation}
+		\begin{bmatrix}
+			\dot{x}      \\
+			\dot{y}      \\
+			\dot{\theta} 
+		\end{bmatrix}=
+		\begin{bmatrix}
+			\cos\theta & 0  \\
+			\sin\theta & 0            \\
+			0 & 1\\
+		\end{bmatrix}
+		\begin{bmatrix}
+			v\\
+			\omega
+		\end{bmatrix}
+	\end{equation}
+\end{tcolorbox}
+
+
+
+\section{Forward Kinematic}
+We have our kinematic
+\begin{equation}
+	\begin{bmatrix}
+		\dot{x}      \\
+		\dot{y}      \\
+		\dot{\theta} 
+	\end{bmatrix}=
+	\begin{bmatrix}
+		v\cos\theta\\
+		v\sin\theta\\
+		\omega\\
+	\end{bmatrix}
+\end{equation}
+We can determine the pose of robot by integral the equation. There are more ways to do the integral:
+\subsection{Euler Approximation}
+This is for assume $v$ and $\omega$ are constant for $T_s$ is constant.
+\begin{tcolorbox}[title=Euler Approximation Descretization]
+\begin{equation}
+	\begin{bmatrix}
+		x      \\
+		y      \\
+		\theta 
+	\end{bmatrix}_k=
+	\begin{bmatrix}
+		x_{k-1} + v_{k-1}\cos\theta_{k-1} T_s\\
+		y_{k-1} + v_{k-1}\sin\theta_{k-1} T_s\\
+		\theta_{k-1} + \omega_{k-1} T_s\\
+	\end{bmatrix}
+\end{equation}
+\end{tcolorbox}
+
+\subsection{Trapezoidal}
+\begin{tcolorbox}[title=Trapezoidal Descretization]
+\begin{equation}
+	\begin{bmatrix}
+		x      \\
+		y      \\
+		\theta 
+	\end{bmatrix}_k=
+	\begin{bmatrix}
+		x_{k-1} + v_{k-1}\cos(\theta_{k-1}+\frac{\omega_{k-1}T_s}{2}) T_s\\
+		y_{k-1} + v_{k-1}\sin(\theta_{k-1}+\frac{\omega_{k-1}T_s}{2}) T_s\\
+		\theta_{k-1} + \omega_{k-1} T_s\\
+	\end{bmatrix}
+\end{equation}
+\end{tcolorbox}
+
+
+\section{Inverse Kinematic}
+In mobile robot, there isn't exact solution to drive robot from its current pose to desired pose. There are multiple ways to control the robot. The inverse kinematic problem for desired smooth target trajectory $x(t), y(t)$ that robot will follow the trajectory while its orientation is tangent to trajectory. Trajectory is a robot's configuration point in time. There are many type of trajectories, such as point, line, equation with function of time -etc. We want the robot to run smoothly so, the trajectory must be smooth as well. Which mean it must have velocity and acceleration define.
+
+\begin{figure}[h]
+	\centering
+	%		\def\svgscale{1}
+	\includesvg{src/wmr/2inv}
+	\caption{Inverse Kinematic Trajectory}
+\end{figure}
+
+\begin{tcolorbox}[title=Reference Trajectory Velocity]
+	Calculate $v$ desired linear forward velocity
+	\begin{equation}
+		v(t) = \pm \sqrt{\dot{x}^2(t) + \dot{y}^2(t)}
+	\end{equation}
+	Calculate $\omega$ desired angular velocity
+	\begin{equation}
+		\omega(t) = \frac{\dot{x}(t)\ddot{y}(t) - \dot{y}(t)\ddot{x}(t)}{\dot{x}^2(t) + \dot{y}^2(t)}
+	\end{equation}
+\end{tcolorbox}
+
+In inverse kinematic for mobile robot, we want to calculate each wheel velocity to control each wheel to follow along the trajectory. In this part, it is usually used for determine the feedforward part of control supplementary to the feedback. Feedback part will take care of imperfect kinematic model, disturbances and initial pose.
+
+\section{Controllability}
+Can a robot moves from point A to point B using all the maneuver it has ?. We say it is controllable if it can reach any configuration $q$ by combine all available motion that it can do. Because the differential drive robot is a nonholonomic system can it be control ? we can proof that it is controllable using \textbf{Lie Bracket Algebra}. If the $det(p_1,p_2,[p_1,p_2])$ is not zero than we say it is controllable.
+\paragraph{Lie Bracket Algebra}
+\[
+[p_1,p_2] = \frac{\partial p_2}{\partial q}p_1 -\frac{\partial p_1}{\partial q}p_2
+\]
+\paragraph{Differential Drive} We have:
+\[
+\begin{bmatrix}
+	\dot{x}\\
+	\dot{y}\\
+	\dot{\theta}\\
+\end{bmatrix}=
+\begin{bmatrix}
+	cos \theta && 0\\
+	sin \theta && 0\\
+	0 && 1
+\end{bmatrix}
+\begin{bmatrix}
+	v\\
+	\omega
+\end{bmatrix}
+\]
+We get:
+\[
+p_1 = \begin{bmatrix}
+	cos \theta\\
+	sin \theta\\
+	0
+\end{bmatrix},
+p_2 = \begin{bmatrix}
+	0\\
+	0\\
+	1
+\end{bmatrix},
+[p_1,p_2] = \begin{bmatrix}
+	sin \theta\\
+	-cos \theta\\
+	0
+\end{bmatrix}
+\]
+Thus we can proof that the robot is controllable by:
+\[det
+\begin{bmatrix}
+	cos \theta && 0 && sin \theta \\
+	sin \theta && 0 && -cos \theta \\
+	0 && 1 && 0
+\end{bmatrix} = 1
+\]
