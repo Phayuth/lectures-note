@@ -1,0 +1,29 @@
+\documentclass[12pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{ntheorem}
+\usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
+\usepackage{graphicx,svg,calc}
+\graphicspath{{./fig/}}
+\usepackage{ct_cmd}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage[hidelinks]{hyperref} %for reference automatically
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\begin{document}
+	\title{My Lecture Note: Mobile Robot}
+	\author{Phayuth}
+	\maketitle
+	
+	\tableofcontents
+
+	\include{wmr/kine}
+	\include{wmr/dyna}
+	
+	
+\end{document}
