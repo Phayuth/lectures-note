@@ -17,6 +17,8 @@
 *.fls
 *.run.xml
 *.synctex.gz
+*.thm
+*.bbl-SAVE-ERROR
 
 
 svg-inkscape/

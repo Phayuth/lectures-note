@@ -1,0 +1,306 @@
+\chapter{Camera Modeling}
+
+This article presents the method of camera modeling and calibration. Projection, Collinearity Model equation, Distortion model, Bundle Adjustment.
+
+\section*{Nomenclature}
+\begin{tabbing}
+    $P$\qquad \= Projection Matrix\\
+    $x$ \> Pixel\\
+\end{tabbing}
+
+
+\section{Camera Model}
+\subsection{Projection Model}
+A 3D point in the world coordinate is projected onto the image plane using a camera projection matrix. \cite{calibCameraModels}, \cite{opencvCameraCalibration}
+
+
+\[
+s p = K [R |t ] P_w
+\]
+
+Here, $P_w$ is a 3D point expressed in the world frame. $p$ is a 2D pixel in the image plane. $K$ is a camera intrinsic matrix. $[R|t]$ is a transformation matrix of the world frame to the camera frame. $s$ is an arbitrary scaling of homogenous projection and is not a part of the model.
+
+To project a 3D point expressed in the camera frame to the image pixel, we use the camera intrinsic matrix $K$.
+\[
+p = K P_c
+\]
+\[
+s \begin{bmatrix}
+    u \\ v \\ 1
+\end{bmatrix} =
+\begin{bmatrix}
+    f_x & 0 & c_x \\
+    0  & f_y& c_y \\
+    0  & 0 &  1  \\
+\end{bmatrix}
+\begin{bmatrix}
+    X_c \\ Y_c \\ Z_c
+\end{bmatrix}
+\]
+
+To transform the point in the world frame to the camera frame, we use the transformation matrix $[R|t]$.
+\[
+P_c = [R|t] P_w
+\]
+\[
+\begin{bmatrix}
+    X_c \\ Y_c \\ Z_c \\ 1
+\end{bmatrix} =
+\begin{bmatrix}
+    r_{11} & r_{12} & r_{13} & t_x \\
+    r_{21} & r_{22} & r_{23} & t_y \\
+    r_{31} & r_{32} & r_{33} & t_z \\
+    0 & 0 & 0 &  1  \\
+\end{bmatrix}
+\begin{bmatrix}
+    X_w \\ Y_w \\ Z_w \\ 1
+\end{bmatrix}
+\]
+
+The normalized 3D point in the camera frame is determined by
+\[
+x' = \frac{X_c}{Z_c}, y' = \frac{Y_c}{Z_c}, 1 = \frac{Z_c}{Z_c}
+\]
+\[
+Z_c \begin{bmatrix}
+    x' \\ y' \\ 1
+\end{bmatrix} =
+\begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+    X_c \\ Y_c \\ Z_c \\ 1
+\end{bmatrix}
+\]
+
+A distortion-free projection model is
+\[
+s \begin{bmatrix}
+    u \\ v \\ 1
+\end{bmatrix} =
+\begin{bmatrix}
+    f_x & 0 & c_x \\
+    0  & f_y& c_y \\
+    0  & 0 &  1  \\
+\end{bmatrix}
+\begin{bmatrix}
+    r_{11} & r_{12} & r_{13} & t_x \\
+    r_{21} & r_{22} & r_{23} & t_y \\
+    r_{31} & r_{32} & r_{33} & t_z \\
+\end{bmatrix}
+\begin{bmatrix}
+    X_w \\ Y_w \\ Z_w \\ 1
+\end{bmatrix}
+\]
+
+If $Z_c \neq 0$, the transformation above is equivalent to
+\[
+\begin{bmatrix}
+    u \\ v \\ 1
+\end{bmatrix} =
+\begin{bmatrix}
+    f_x & 0 & c_x \\
+    0  & f_y& c_y \\
+    0  & 0 &  1  \\
+\end{bmatrix}
+\begin{bmatrix}
+    \frac{X_c}{Z_c} \\ \frac{Y_c}{Z_c} \\ \frac{Z_c}{Z_c}
+\end{bmatrix} =
+\begin{bmatrix}
+    f_x \frac{X_c}{Z_c} + c_x \\
+    f_y \frac{Y_c}{Z_c} + c_y \\
+    1
+\end{bmatrix} =
+\begin{bmatrix}
+    f_x x' + c_x\\
+    f_y y' + c_y \\
+    1
+\end{bmatrix}
+\]
+
+\subsection{Collinearity Model}
+
+The collinearity equation in photogrammetry relates the 3D coordinates of a point in object space to its corresponding 2D coordinates in an image through perspective projection. It expresses the condition that the image point, the 3D object point, and the camera's center of projection lie on the same line (are collinear).
+
+\[
+x = x_0 - f_x\frac{r_{11}(X - X_s) + r_{12}(Y - Y_s) + r_{13}(Z - Z_s)}{r_{31}(X - X_s) + r_{32}(Y - Y_s) + r_{33}(Z - Z_s)}
+\]
+
+\[
+y = y_0 - f_y\frac{r_{21}(X - X_s) + r_{22}(Y - Y_s) + r_{23}(Z - Z_s)}{r_{31}(X - X_s) + r_{32}(Y - Y_s) + r_{33}(Z - Z_s)}
+\]
+
+Theoretically, the pixels calculated from the camera projection and collinearity models must be equal. However, these two models used different coordinate models. To be precise, they are flipped. To correct this issue, we flip the sign in the collinearity equation to make them both equal.
+
+\[
+x = x_0 \textcolor{red}{+} f_x\frac{r_{11}(X - X_s) + r_{12}(Y - Y_s) + r_{13}(Z - Z_s)}{r_{31}(X - X_s) + r_{32}(Y - Y_s) + r_{33}(Z - Z_s)}
+\]
+
+\[
+y = y_0 \textcolor{red}{+} f_y\frac{r_{21}(X - X_s) + r_{22}(Y - Y_s) + r_{23}(Z - Z_s)}{r_{31}(X - X_s) + r_{32}(Y - Y_s) + r_{33}(Z - Z_s)}
+\]
+
+
+Where:
+\begin{itemize}
+    \item $(X, Y, Z)$: Coordinates of the object point in 3D space (object space). (Coordinates of the 3D point in world space.)
+    \item $(X_s, Y_s, Z_s)$: Coordinates of the camera's center of projection (camera location). (Camera's position in world space.)
+    \item $(f_x, f_y)$: Focal length of the camera.
+    \item $(x_0, y_0)$: Principal point coordinates (image center) on the image plane.
+    \item $r_{ij}$: Elements of the rotation matrix that describe the orientation of the camera relative to the object space. R(3x3) matrix.
+    \item $(x, y)$: 2D image coordinates of the projected point in the image plane.
+\end{itemize}
+
+
+
+
+
+
+\section{Distortion Model}
+
+The collinearity equations describe the ideal projection of 3D points onto the 2D image plane, assuming a pinhole camera model. However, in real-world cameras, lens distortions—primarily radial and tangential—affect the final position of the image points. We apply corrections after the collinearity equations, which compute the undistorted image coordinates to account for lens distortions.
+
+\subsection{Correction before projection}
+To incorporate the distortion in the model, we use
+\[
+\begin{bmatrix}
+    u \\ v
+\end{bmatrix} =
+\begin{bmatrix}
+    f_x x'' + c_x \\
+    f_y y'' + c_y
+\end{bmatrix}
+\]
+
+where
+\[
+\begin{bmatrix}
+    x'' \\ y''
+\end{bmatrix} =
+\begin{bmatrix}
+    x'\frac{1+k_1r^2+k_2r^4+k_3r^6}{1+k_4r^2+k_5r^4+k_6r^6} + 2p_1x'y' + p_2(r^2+2x'^2) \\
+    y'\frac{1+k_1r^2+k_2r^4+k_3r^6}{1+k_4r^2+k_5r^4+k_6r^6} + p_1(r^2+2y'^2) + 2p_2x'y'
+\end{bmatrix}
+\]
+\[
+r^2 = x'^2 + y'^2
+\]
+
+
+\subsection{Correction after projection}
+
+Incorporating Distortion into the Collinearity Equations
+First, we compute the ideal image points $(x_{ideal},y_{ideal})$ using the collinearity equations without distortion. These are the points where the 3D world points would project in a perfect pinhole camera model. Next, we apply distortion to the undistorted points $(x_{ideal},y_{ideal})$ to get the distorted image points $(x,y)$
+\[
+x_{distored} = x_{ideal} (1+k_1r^2+k_2r^4+k_3r^6) + [2p_1x_{ideal}y_{ideal} + p_2(r^2+2x_{ideal}^2)]
+\]
+\[
+y_{distored} = y_{ideal} (1+k_1r^2+k_2r^4+k_3r^6) + [p_1(r^2+2y_{ideal}^2) + 2p_2x_{ideal}y_{ideal}]
+\]
+\[
+r^2 = (x_{ideal} - x_0)^2 + (y_{ideal} - y_0)^2 distance from center
+\]
+The final coordinates $(x_{distored},y_{distored})$ are the observed (distorted) image points. the ideal $(x_{ideal},y_{ideal})$ are calculated from the collinearity equations.
+
+
+% \[
+% \begin{bmatrix}
+    %     u \\
+    %     v \\
+    %     w
+    % \end{bmatrix} =
+% \begin{bmatrix}
+    %     p_{11} & p_{12} & p_{13} & p_{14} \\
+    %     p_{21} & p_{22} & p_{23} & p_{24} \\
+    %     p_{31} & p_{32} & p_{33} & p_{34} \\
+    % \end{bmatrix}
+% \begin{bmatrix}
+    %     X \\
+    %     Y \\
+    %     Z \\
+    %     1
+    % \end{bmatrix}
+% \]
+
+% A projection matrix is composed of an intrinsic and an extrinsic matrix.
+% \[
+% P = M_{int}M_{ext}
+% \]
+% The extrinsic matrix converts a point in the world coordinate to the camera coordinate. It is the same way as saying the transformation matrix from world coordinate to camera coordinate. Then, the intrinsic matrix converts the point in the camera coordinate to the pixel coordinate. The projection matrix has scale, meaning that the homogenous pixel coordinates are the same whether it is $P$ or scaled by a scalar value $kP$.
+% \[
+% M_{int} = \begin{bmatrix}
+    %     f_x & 0 & o_x & 0\\
+    %     0  & f_y& o_y & 0\\
+    %     0  & 0 &  1 & 0\\
+    % \end{bmatrix},
+% M_{ext} = \begin{bmatrix}
+    %     r_{11} & r_{12} & r_{13} & t_x \\
+    %     r_{21} & r_{22} & r_{23} & t_y \\
+    %     r_{31} & r_{32} & r_{33} & t_z \\
+    %     0 & 0 & 0 & 1
+    % \end{bmatrix}
+% \]
+
+
+
+
+\section{Bundle Adjustment}
+
+Bundle adjustment is an optimization technique used in computer vision, photogrammetry, and 3D reconstruction to refine the estimates of camera parameters. It simultaneously refines intrinsic parameters (like focal length, principal point, distortion coefficients), extrinsic parameters (camera rotation and translation), and 3D points' positions in the scene, hence the name "bundle," because both camera poses and the bundle of rays (from the camera to the 3D points) are optimized. It works by minimizing the re-projection error between observed and predicted image points. Non-linear least squares optimization (e.g., Levenberg-Marquardt) is used to minimize the re-projection error iteratively.
+
+\subsection{Calibration}
+
+The calibration procedure required the 2D Image Coordinates of Calibration Points and the 3D World Coordinates of Calibration Points.
+
+2D Image Coordinates of Calibration Points. These are the observed pixel coordinates of known points (often from a calibration pattern like a chessboard or a set of precisely placed markers) in the image(s). These points are typically captured using multiple images taken from different angles. $(x_i,y_i)$ in pixel units, where $i$ is the index of a point.
+
+3D World Coordinates of Calibration Points. These are the known coordinates of the calibration points in the real-world reference system (object space). For example, if a chessboard pattern is used, the coordinates of the corners are known in 3D space, usually in some convenient metric (e.g., millimeters). $(X_i, Y_i, Z_i)$. ($Z_i$ could be 0 for points on a flat plane (like a chessboard)).
+
+\subsection{Optimization Variable}
+
+The goal of calibration is to solve for the intrinsic ($f_x, f_y, x_0, y_0, k_1,k_2,k_3, p_1,p_2$) and extrinsic parameters (camera position $(T=(X_s, Y_s, Z_s)$ and orientation $R$) by minimizing the difference between the predicted and observed image coordinates.
+
+\begin{itemize}
+    \item $(f_x,f_y)$: the focal lengths in the $x$ and $y$ directions, typically measured in pixel units. In many cases, the focal lengths are assumed to be the same, but they could differ depending on the camera's aspect ratio.
+    \item $(x_0,y_0)$: Principle Point is the point where the optical axis intersects the image plane, ideally near the center of the image but it might slightly shift due to lens alignment issues.
+    \item $(k_1,k_2,k_3), (p_1,p_2)$: Radial Distortion, Tangential Distortion.
+    \item $R$: the 3×3 rotation matrix defines the orientation of the camera relative to the world coordinate system.
+    \item $T=(X_s, Y_s, Z_s)$: The 3×1 translation vector defines the position of the camera in the world coordinate system.
+\end{itemize}
+
+\subsection{Calibrate}
+
+The goal of bundle adjustment is to minimize the re-projection error, which is the difference between the actual observed 2D image coordinates and the projected 2D points based on the current estimates of the 3D points and camera parameters.
+
+
+Formulating the Error Function:
+\[
+Error = \sum_{i=1}^N ((x_{observed} - x_{projection})^2 + (y_{observed} - y_{projection})^2)
+\]
+$(x_{observed}, y_{observed})$ are calculated using the collinearity equations. $(x_{projection}, y_{projection})$ are the actual image points.
+
+\begin{itemize}
+    \item Initial Estimates: You start with initial guesses of the 3D points in the scene and the camera parameters, which might come from other methods such as feature matching or structure-from-motion (SfM). This can be done using Direct linear transformation (DLT) or another simple method. Intrinsic camera parameters (like focal length) can be approximated based on the sensor size and field of view.
+    \item Projection of 3D Points: Each 3D point in the scene is projected into the 2D image plane of each camera according to the camera model and its parameters (such as focal length, distortion coefficients, and camera position/orientation).
+    \item Re-projection Error: The difference between where the 3D points project onto the image (based on the estimated camera parameters) and where the actual observed points are in the image is calculated. This difference is called the re-projection error.
+    \item Non-linear Optimization: The bundle adjustment process uses non-linear least squares optimization (e.g., Levenberg-Marquardt algorithm) to minimize the re-projection error by simultaneously adjusting the 3D points and the camera parameters.
+    \item Refined Results: After optimization, the adjusted 3D points and camera parameters more accurately represent the scene and the imaging setup. This results in a better 3D reconstruction, more precise camera calibration, or improved pose estimation.
+    \item The optimization continues until the re-projection error converges below a certain threshold, meaning the estimated parameters are consistent with the observed image points.
+\end{itemize}
+
+
+
+
+\subsection{Calibration Result Evaluation}
+Evaluation of Calibration (Re-projection Error)
+The overall quality of the calibration is typically evaluated using the mean re-projection error MRE:
+\[
+MRE = \frac{1}{N} \sum_{i=1}^N \sqrt{((x_{observed} - x_{projection})^2 + (y_{observed} - y_{projection})^2)}
+\]
+A low re-projection error indicates good calibration quality.
+
+
+\clearpage
+\printbibliography[heading=subbibliography, title=\bibname\ for \chaptername~\thechapter]

@@ -1,0 +1,50 @@
+\documentclass[12pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{ntheorem}
+\usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{calc}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage[
+pdftitle={},
+pdfsubject={},
+pdfauthor={},
+pdfkeywords={},
+hidelinks,
+colorlinks=true,
+allcolors=blue,
+]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage[
+backend=biber,
+% language=english
+% citestyle=ieee
+% maxbibnames=2,
+% firstinits=true
+backref=true,
+refsection=chapter,
+]{biblatex}
+\bibliography{references.bib}
+
+\usepackage{algorithm}
+\usepackage{algpseudocodex}
+
+\begin{document}
+	\title{My Lecture Note: Robotics}
+	\author{Phayuth}
+	\maketitle
+
+	\tableofcontents
+
+	\include{chapters/camera}
+	\include{chapters/torus}
+
+\end{document}
